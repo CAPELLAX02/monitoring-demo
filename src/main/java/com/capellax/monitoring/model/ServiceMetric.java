@@ -1,4 +1,4 @@
-package com.capellax.monitoring.entity;
+package com.capellax.monitoring.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
