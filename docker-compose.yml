@@ -1,26 +1,7 @@
 version: '3.8'
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-      - prometheus
-      - grafana
-      - maildev
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/monitoring_db
-      SPRING_DATASOURCE_USERNAME: capellax
-      SPRING_DATASOURCE_PASSWORD: 123456
-      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: '*'
-      SPRING_MAIL_HOST: maildev
-      SPRING_MAIL_PORT: 1025
-
   postgres:
-    image: postgres:15
+    image: postgres:17-alpine
     container_name: postgres_container
     restart: always
     ports:
