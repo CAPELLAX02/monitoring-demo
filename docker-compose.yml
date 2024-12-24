@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   app:
     build:
@@ -7,15 +8,19 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+      - prometheus
+      - grafana
+      - maildev
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/monitoring
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=password
-      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/monitoring_db
+      SPRING_DATASOURCE_USERNAME: capellax
+      SPRING_DATASOURCE_PASSWORD: 123456
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: '*'
+      SPRING_MAIL_HOST: maildev
+      SPRING_MAIL_PORT: 1025
 
   postgres:
-    image: postgres:17-alpine
+    image: postgres:15
     container_name: postgres_container
     restart: always
     ports:
@@ -23,7 +28,9 @@ services:
     environment:
       POSTGRES_USER: capellax
       POSTGRES_PASSWORD: 123456
-      POSTGRES_DATABASE: monitoring_db
+      POSTGRES_DB: monitoring_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   prometheus:
     image: prom/prometheus
@@ -32,7 +39,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
   grafana:
     image: grafana/grafana
@@ -42,6 +49,14 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  maildev:
+    image: maildev/maildev
+    container_name: maildev_container
+    restart: always
+    ports:
+      - "1025:1025"
+      - "1080:1080"
 
 volumes:
   postgres_data:
